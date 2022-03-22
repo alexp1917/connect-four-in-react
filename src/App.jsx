@@ -1,12 +1,36 @@
-import { useState } from 'react'
+import { Provider } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+
+import { configureStore } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
 import logo from './logo.svg';
 import './App.css';
 
 var SIZE = 10;
 
+var counterSlice = createSlice({
+  name: 'counter',
+  initialState: { value: 0, },
+  reducers: {
+    increment: (state) => { state.value += 1 },
+    decrement: (state) => { state.value -= 1 },
+    incrementByAmount: (state, action) => { state.value += action.payload },
+  },
+})
+var { increment, decrement, incrementByAmount } = counterSlice.actions;
+
+var store = configureStore({
+  reducer: {
+    counter: counterSlice.reducer
+  },
+})
+
 function DropButton() {
-  return <div className="c4-header"></div>
+  var count = useSelector((state) => state.counter.value)
+  var dispatch = useDispatch()
+
+  return <div className="c4-header" onClick={() => dispatch(increment())}>{count}</div>
 }
 
 function DropButtons() {
@@ -17,9 +41,8 @@ function DropButtons() {
   </div>
 }
 
-function App() {
+function Header() {
   return (
-    <div className="App">
       <header className="App-header">
         <h1>connect four</h1>
         <DropButtons />
@@ -47,7 +70,16 @@ function App() {
           Learn React
         </a>
       </header>
-    </div>
+    );
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <div className="App">
+        <Header/>
+      </div>
+    </Provider>
   );
 }
 
